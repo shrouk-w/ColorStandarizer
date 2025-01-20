@@ -59,7 +59,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // Load the image
-            File input = new File("C:\\Users\\User\\Desktop\\javaprojects\\colorchanger\\src\\vvv.png");
+            File input = new File("src/vvv.png");
             BufferedImage image = ImageIO.read(input);
 
             // Process each pixel in the image
