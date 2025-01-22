@@ -40,21 +40,17 @@ public class Main {
                                 return e2.getValue().compareTo(e1.getValue());
                             }
                     )
-                    .limit(3)
+                    .limit(Integer.parseInt(args[1]))
                     .map(Map.Entry::getKey)
                     .map((e1)->{
                         return new int[]{(e1>>16)&0xFF, (e1>>8)&0xFF, (e1)&0xFF};
                     })
                     .collect(Collectors.toList());
-            //get top 30 colors from standardized picture
-
-            /*for(int i=0;i<colorPalette.size();i+=2)
-            {
-                colorPalette.remove(i);
-            }*/
-
+            //get top colors from the standardized picture
 
             colorPalette.add(new int[]{0,0,0});
+
+            //always add black
 
             for (int y = 0; y < image.getHeight(); y++) {
                 for (int x = 0; x < image.getWidth(); x++) {
@@ -70,39 +66,59 @@ public class Main {
                     image.setRGB(x,y,newColor);
                 }
             }
-            //get all colours to closests from top 30
+            //set all the colors to the closest from the top color list
+
+            for (int y = 0; y < image.getHeight() - 1; y += 2) {
+                for (int x = 0; x < image.getWidth() - 1; x += 2) {
+                    int leftup = image.getRGB(x, y + 1);
+                    int rightup = image.getRGB(x + 1, y + 1);
+                    int leftdown = image.getRGB(x, y);
+                    int rightdown = image.getRGB(x + 1, y);
 
 
-            File output3 = new File("outputnotaltered.png");
-            ImageIO.write(image, "png", output3);
+                    boolean allDifferent = !(leftup == rightup && leftdown == rightdown && leftup == rightdown);
 
 
+                    boolean noneBlack = leftup != Color.BLACK.getRGB() &&
+                            rightup != Color.BLACK.getRGB() &&
+                            leftdown != Color.BLACK.getRGB() &&
+                            rightdown != Color.BLACK.getRGB();
 
+                    if (allDifferent && noneBlack) {
+                        image.setRGB(x, y, Color.BLACK.getRGB());
+                        image.setRGB(x + 1, y, Color.BLACK.getRGB());
+                        image.setRGB(x, y + 1, Color.BLACK.getRGB());
+                        image.setRGB(x + 1, y + 1, Color.BLACK.getRGB());
+                    }
+                }
+            }
 
-
-
+            //go through the picture check 2x2 pixels and if there is any difference change all to black
+            //dont change if any of them is black already
 
 
             for (int y = 0; y < image.getHeight(); y++) {
                 for (int x = 0; x < image.getWidth(); x++) {
                     int currentPixel = image.getRGB(x, y);
 
-                    // Extract RGB components
+
                     int red = (currentPixel >> 16) & 0xFF;
                     int green = (currentPixel >> 8) & 0xFF;
                     int blue = currentPixel & 0xFF;
 
-                    // Calculate luminance (brightness)
+
                     double luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 
-                    // Threshold for "close to black" (adjust the value if needed)
-                    if (luminance < 70) { // Close to black
+                    //for "close to black" (adjust the value if needed)
+
+                    if (luminance < Integer.parseInt(args[2])) {
                         image.setRGB(x, y, Color.BLACK.getRGB());
-                    } else { // Not close to black
+                    } else {
                         image.setRGB(x, y, Color.WHITE.getRGB());
                     }
                 }
             }
+            //change pixels that are almost black to black all the other to white
 
             File output = new File("output.png");
             ImageIO.write(image, "png", output);
