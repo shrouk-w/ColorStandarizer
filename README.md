@@ -4,7 +4,7 @@ it works better with certain pictures, usually when the picture is not dark and 
 
 program takes 3 arguments  
 #
-1 - path to your picture (eg. path.picture.png)
+1 - path to your picture (eg. path/picture.png)
 
 #
 2 - numerical value that determines to how many colors picture is reduced before changing it to black and white 
